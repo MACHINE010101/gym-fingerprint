@@ -1,0 +1,46 @@
+
+Error SearchByPhone Function : Data type mismatch in criteria expression.
+Error SearchByPhone Function : Cust_Name
+Error SearchByPhone Function : Cust_Name
+Error SearchByCustNo : '\\server\C\projects\RafW\Maindb.mdb' is not a valid path.  Make sure that the path name is spelled correctly and that you are connected to the server on which the file resides.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Customers.Cust_Photo WHERE Customers.Cust_No = ?'.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Customers.Cust_Photo WHERE Customers.Cust_No = ?'.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Customers.SubType WHERE Customers.Cust_No = ?'.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : The SELECT statement includes a reserved word or an argument name that is misspelled or missing, or the punctuation is incorrect.
+Error SearchByCustNo : Could not find file 'D:\My SRCs\FingerPrint Reader ( RaF Gym ) MENS\FingerPrint Reader ( RaF Gym )\bin\Debug\Maindb.mdb'.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Cust_Photo WHERE Cust_No = 101'.
+Error SearchByCustNo : '\\server\C\projects\Raf\Maindb.mdb' is not a valid path.  Make sure that the path name is spelled correctly and that you are connected to the server on which the file resides.
+Error SearchByCustNo : String was not recognized as a valid DateTime.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Customers.Cust_No = 102
+102'.
+Error SearchByCustNo : String was not recognized as a valid DateTime.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Customers.Cust_No = 102
+103'.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Customers.Cust_Name WHERE Customers.Cust_No = ?'.
+Error SearchByCustNo : Syntax error (missing operator) in query expression 'Customers.Cust_Name
+        WHERE Customers.Cust_No = ?'.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : No value given for one or more required parameters.
+Error SearchByCustNo : String was not recognized as a valid DateTime.
+Error SearchByCustNo : String was not recognized as a valid DateTime.
+Error SearchByCustNo : المسار '\\server\C\projects\RafW\Maindb.mdb' غير صالح. تأكد من أن تهجئة اسم المسار صحيحة ومن أن الاتصال يتم مع الملقم الذي يكمن فيه الملف.
+Error SearchByCustNo : محاولة غير صالحة لاستدعاء Read في الوقت الذي يكون القارئ فيه مغلقًا.
