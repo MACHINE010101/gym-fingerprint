@@ -204,125 +204,214 @@ namespace FingerPrint_Reader___RaF_Gym__
             }
         }
 
-        protected override void DefWndProc(ref Message m)
+        //protected override void DefWndProc(ref Message m)
+        //{
+        //    switch (m.Msg)
+        //    {
+        //        case MESSAGE_CAPTURED_OK:
+        //            {
+        //                MemoryStream ms = new MemoryStream();
+        //                BitmapFormat.GetBitmap(FPBuffer, mfpWidth, mfpHeight, ref ms);
+        //                Bitmap bmp = new Bitmap(ms);
+        //                this.picFPImg.Image = bmp;
+        //                if (IsRegister)
+        //                {
+        //                    int ret = zkfp.ZKFP_ERR_OK;
+        //                    int fid = 0, score = 0;
+        //                    ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
+        //                    if (zkfp.ZKFP_ERR_OK == ret)
+        //                    {
+        //                        label13.Text = " البصمة مسجلة من قبل " + fid + " ! ";
+        //                        return;
+        //                    }
+        //                    if (RegisterCount > 0 && zkfp2.DBMatch(mDBHandle, CapTmp, RegTmps[RegisterCount - 1]) <= 0)
+        //                    {
+        //                        label13.Text = "الرجاء الضغط 3 مرات.";
+        //                        return;
+        //                    }
+        //                    Array.Copy(CapTmp, RegTmps[RegisterCount], cbCapTmp);
+        //                    String strBase64 = zkfp2.BlobToBase64(CapTmp, cbCapTmp);
+        //                    byte[] blob = zkfp2.Base64ToBlob(strBase64);
+        //                    RegisterCount++;
+        //                    if (RegisterCount >= REGISTER_FINGER_COUNT)
+        //                    {
+        //                        RegisterCount = 0;
+        //                        if (zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBMerge(mDBHandle, RegTmps[0], RegTmps[1], RegTmps[2], RegTmp, ref cbRegTmp)) &&
+        //                               zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBAdd(mDBHandle, iFid, RegTmp)))
+        //                        {
+        //                            iFid++;
+        //                            try
+        //                            {
+        //                                zkfp.Blob2Base64String(RegTmp, 2048, ref templateString);
+        //                                StoreFingerprintForExistingCustomer(templateString);
+        //                                IsRegister = false;
+        //                                cbRegTmp = 0;
+        //                                RegisterCount = 0;
+        //                            }
+        //                            catch (Exception ex)
+        //                            {
+        //                                MessageBox.Show("Error : " + ex.Message);
+        //                                File.AppendAllText("Reference\\Logs.txt", $"\r\nError DefWndProc Exception 1 : {ex.Message}");
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            label13.Text = " مشكلة في الادخال. " + ret;
+        //                        }
+        //                        IsRegister = false;
+        //                        return;
+        //                    }
+        //                    else
+        //                    {
+        //                        label13.Text = " مرات " + (REGISTER_FINGER_COUNT - RegisterCount) + " الرجاء الضغط ";
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (bIdentify)
+        //                    {
+        //                        try
+        //                        {
+        //                            string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
+        //                            string query = "SELECT * FROM Customers";
+
+        //                            using (OleDbConnection connection = new OleDbConnection(connectionString))
+        //                            {
+        //                                try
+        //                                {
+        //                                    int x = 0;
+        //                                    connection.Open();
+        //                                    OleDbCommand command = new OleDbCommand(query, connection);
+        //                                    OleDbDataReader reader = command.ExecuteReader();
+        //                                    while (reader.Read())
+        //                                    {
+        //                                        if (!reader.IsDBNull(reader.GetOrdinal("Fingerprint")))
+        //                                        {
+        //                                            string stringTemplate = reader.GetString(reader.GetOrdinal("Fingerprint"));
+        //                                            byte[] templateFromDbZk4500 = zkfp.Base64String2Blob(stringTemplate);
+
+        //                                            int score = zkfp2.DBMatch(mDBHandle, templateFromDbZk4500, CapTmp);
+        //                                            if (score > 0)
+        //                                            {
+        //                                                SearchByCustNo(reader["Cust_No"].ToString(), true);
+        //                                                textBox9.Text = reader["Cust_No"].ToString();
+        //                                                break;
+        //                                            }
+        //                                        }
+        //                                    }
+        //                                }
+        //                                catch (Exception ex)
+        //                                {
+        //                                    MessageBox.Show("Error during matching : " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //                                    File.AppendAllText("Reference\\Logs.txt", $"\r\nError DefWndProc Exception 2 : {ex.Message}");
+        //                                }
+        //                            }
+        //                        }
+        //                        catch(Exception ex)
+        //                        {
+        //                            MessageBox.Show("Error : " + ex.Message,"RaF Gym",MessageBoxButtons.OK,MessageBoxIcon.Error);
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        MessageBox.Show("EMPTY");
+        //                    }
+        //                }
+        //            }
+        //            break;
+
+        //        default:
+        //            base.DefWndProc(ref m);
+        //            break;
+        //    }
+        //}
+
+        //TESTING
+        public void IdentifyFingerprint()
         {
-            switch (m.Msg)
+            try
             {
-                case MESSAGE_CAPTURED_OK:
+                string mdbFilePath = @"D:\playground\TestDB.mdb";
+                string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
+                string query = "SELECT * FROM Customers";
+
+                using (OleDbConnection connection = new OleDbConnection(connectionString))
+                {
+                    try
                     {
-                        MemoryStream ms = new MemoryStream();
-                        BitmapFormat.GetBitmap(FPBuffer, mfpWidth, mfpHeight, ref ms);
-                        Bitmap bmp = new Bitmap(ms);
-                        this.picFPImg.Image = bmp;
-                        if (IsRegister)
-                        {
-                            int ret = zkfp.ZKFP_ERR_OK;
-                            int fid = 0, score = 0;
-                            ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
-                            if (zkfp.ZKFP_ERR_OK == ret)
-                            {
-                                label13.Text = " البصمة مسجلة من قبل " + fid + " ! ";
-                                return;
-                            }
-                            if (RegisterCount > 0 && zkfp2.DBMatch(mDBHandle, CapTmp, RegTmps[RegisterCount - 1]) <= 0)
-                            {
-                                label13.Text = "الرجاء الضغط 3 مرات.";
-                                return;
-                            }
-                            Array.Copy(CapTmp, RegTmps[RegisterCount], cbCapTmp);
-                            String strBase64 = zkfp2.BlobToBase64(CapTmp, cbCapTmp);
-                            byte[] blob = zkfp2.Base64ToBlob(strBase64);
-                            RegisterCount++;
-                            if (RegisterCount >= REGISTER_FINGER_COUNT)
-                            {
-                                RegisterCount = 0;
-                                if (zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBMerge(mDBHandle, RegTmps[0], RegTmps[1], RegTmps[2], RegTmp, ref cbRegTmp)) &&
-                                       zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBAdd(mDBHandle, iFid, RegTmp)))
-                                {
-                                    iFid++;
-                                    try
-                                    {
-                                        zkfp.Blob2Base64String(RegTmp, 2048, ref templateString);
-                                        StoreFingerprintForExistingCustomer(templateString);
-                                        IsRegister = false;
-                                        cbRegTmp = 0;
-                                        RegisterCount = 0;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        MessageBox.Show("Error : " + ex.Message);
-                                        File.AppendAllText("Reference\\Logs.txt", $"\r\nError DefWndProc Exception 1 : {ex.Message}");
-                                    }
-                                }
-                                else
-                                {
-                                    label13.Text = " مشكلة في الادخال. " + ret;
-                                }
-                                IsRegister = false;
-                                return;
-                            }
-                            else
-                            {
-                                label13.Text = " مرات " + (REGISTER_FINGER_COUNT - RegisterCount) + " الرجاء الضغط ";
-                            }
-                        }
-                        else
-                        {
-                            if (bIdentify)
-                            {
-                                try
-                                {
-                                    string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
-                                    string query = "SELECT * FROM Customers";
+                        connection.Open();
+                        OleDbCommand command = new OleDbCommand(query, connection);
+                        OleDbDataReader reader = command.ExecuteReader();
 
-                                    using (OleDbConnection connection = new OleDbConnection(connectionString))
-                                    {
-                                        try
-                                        {
-                                            int x = 0;
-                                            connection.Open();
-                                            OleDbCommand command = new OleDbCommand(query, connection);
-                                            OleDbDataReader reader = command.ExecuteReader();
-                                            while (reader.Read())
-                                            {
-                                                if (!reader.IsDBNull(reader.GetOrdinal("Fingerprint")))
-                                                {
-                                                    string stringTemplate = reader.GetString(reader.GetOrdinal("Fingerprint"));
-                                                    byte[] templateFromDbZk4500 = zkfp.Base64String2Blob(stringTemplate);
+                        byte[] CapTmp = null;
 
-                                                    int score = zkfp2.DBMatch(mDBHandle, templateFromDbZk4500, CapTmp);
-                                                    if (score > 0)
-                                                    {
-                                                        SearchByCustNo(reader["Cust_No"].ToString(), true);
-                                                        textBox9.Text = reader["Cust_No"].ToString();
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            MessageBox.Show("Error during matching : " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            File.AppendAllText("Reference\\Logs.txt", $"\r\nError DefWndProc Exception 2 : {ex.Message}");
-                                        }
-                                    }
-                                }
-                                catch(Exception ex)
-                                {
-                                    MessageBox.Show("Error : " + ex.Message,"RaF Gym",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                                }
-                            }
-                            else
+                        while (reader.Read())
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("Fingerprint")))
                             {
-                                MessageBox.Show("EMPTY");
+                                string stringTemplate = reader.GetString(reader.GetOrdinal("Fingerprint"));
+                                byte[] templateFromDbZk4500 = zkfp.Base64String2Blob(stringTemplate);
+
+                                if (CapTmp == null)
+                                {
+                                    CapTmp = templateFromDbZk4500;
+                                }
+
+                                mDBHandle = zkfp2.DBInit();
+
+                                int score = zkfp2.DBMatch(mDBHandle, templateFromDbZk4500, CapTmp);
+                                if (score > 0)
+                                {
+                                    SearchByCustNo(reader["Cust_No"].ToString(), true);
+                                    textBox9.Text = reader["Cust_No"].ToString();
+                                    break;
+                                }
                             }
                         }
                     }
-                    break;
+                        catch (Exception ex)
+                    {
+                        MessageBox.Show("Error during matching : " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        File.AppendAllText("Reference\\Logs.txt", $"\r\nError DefWndProc Exception 2 : {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error : " + ex.Message, "RaF Gym", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
-                default:
-                    base.DefWndProc(ref m);
-                    break;
+        // Helper method to generate fake fingerprint data
+        public string GenerateFakeFingerprint()
+        {
+            // Create some dummy binary data that resembles fingerprint template
+            byte[] fakeTemplate = new byte[2048];
+            Random random = new Random();
+            random.NextBytes(fakeTemplate);
+
+            // Convert to Base64 like real fingerprint data would be stored
+            return Convert.ToBase64String(fakeTemplate);
+        }
+
+        // Method to insert test data
+        public void InsertTestFingerprint(string customerNo)
+        {
+            string mdbFilePath = @"D:\playground\TestDB.mdb";
+            string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
+            string fakeFingerprint = GenerateFakeFingerprint();
+
+            string query = "UPDATE Customers SET Fingerprint = ? WHERE Cust_No = ?";
+
+            using (OleDbConnection conn = new OleDbConnection(connectionString))
+            {
+                conn.Open();
+                using (OleDbCommand command = new OleDbCommand(query, conn))
+                {
+                    command.Parameters.AddWithValue("?", fakeFingerprint);
+                    command.Parameters.AddWithValue("?", customerNo);
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
@@ -1121,6 +1210,17 @@ ORDER BY Subscribe.End_Date DESC";
                searchByPhone = false;
                searchByCustomerNumber = true;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            IdentifyFingerprint();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string num = textBox7.Text;
+            InsertTestFingerprint(num);
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
