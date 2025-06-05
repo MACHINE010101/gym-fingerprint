@@ -1,4 +1,7 @@
-﻿using System;
+﻿using libzkfpcsharp;
+using Sample;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -17,8 +20,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using libzkfpcsharp;
-using Sample;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace FingerPrint_Reader___RaF_Gym__
@@ -45,6 +46,8 @@ namespace FingerPrint_Reader___RaF_Gym__
         bool searchByCustomerNumber;
 
         string CustomerNo, PhoneNumber;
+
+        private List<(string CustNo, byte[] Template)> fingerprintCache;
 
         IntPtr mDevHandle = IntPtr.Zero;
         IntPtr mDBHandle = IntPtr.Zero;
@@ -94,7 +97,31 @@ namespace FingerPrint_Reader___RaF_Gym__
             searchByCustomerNumber = true;
             searchByPhone = false;
             checkBox1.Checked = true;
+            LoadFingerprintCache();
         }
+
+        private void LoadFingerprintCache()
+        {
+            fingerprintCache = new List<(string CustNo, byte[] Template)>();
+
+            string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
+            string query = "SELECT Cust_No, Fingerprint FROM Customers WHERE Fingerprint IS NOT NULL";
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                connection.Open();
+                OleDbCommand command = new OleDbCommand(query, connection);
+                OleDbDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string custNo = reader["Cust_No"].ToString();
+                    string base64 = reader["Fingerprint"].ToString();
+                    byte[] template = zkfp.Base64String2Blob(base64);
+                    fingerprintCache.Add((custNo, template));
+                }
+            }
+        }
+
 
         private void bnInit_Click(object sender, EventArgs e)
         {
@@ -202,7 +229,7 @@ namespace FingerPrint_Reader___RaF_Gym__
                 }
                 Thread.Sleep(200);
             }
-        }
+        }        
 
         protected override void DefWndProc(ref Message m)
         {
@@ -272,39 +299,31 @@ namespace FingerPrint_Reader___RaF_Gym__
                             {
                                 try
                                 {
-                                    string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
-                                    string query = "SELECT * FROM Customers";
+                                    var matchFound = false;
+                                    string matchedCustNo = null;
+                                    object lockObj = new object();
 
-                                    using (OleDbConnection connection = new OleDbConnection(connectionString))
+                                    Parallel.ForEach(fingerprintCache, (record, state) =>
                                     {
-                                        try
-                                        {
-                                            int x = 0;
-                                            connection.Open();
-                                            OleDbCommand command = new OleDbCommand(query, connection);
-                                            OleDbDataReader reader = command.ExecuteReader();
-                                            while (reader.Read())
-                                            {
-                                                if (!reader.IsDBNull(reader.GetOrdinal("Fingerprint")))
-                                                {
-                                                    string stringTemplate = reader.GetString(reader.GetOrdinal("Fingerprint"));
-                                                    byte[] templateFromDbZk4500 = zkfp.Base64String2Blob(stringTemplate);
+                                        int score = zkfp2.DBMatch(mDBHandle, record.Template, CapTmp);
 
-                                                    int score = zkfp2.DBMatch(mDBHandle, templateFromDbZk4500, CapTmp);
-                                                    if (score > 0)
-                                                    {
-                                                        SearchByCustNo(reader["Cust_No"].ToString(), true);
-                                                        textBox9.Text = reader["Cust_No"].ToString();
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        catch (Exception ex)
+                                        if (score > 0)
                                         {
-                                            MessageBox.Show("Error during matching : " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            File.AppendAllText("Reference\\Logs.txt", $"\r\nError DefWndProc Exception 2 : {ex.Message}");
+                                            lock (lockObj)
+                                            {
+                                                matchFound = true;
+                                                matchedCustNo = record.CustNo;
+                                            }
+
+                                            // Stop the parallel loop
+                                            state.Stop();
                                         }
+                                    });
+
+                                    if (matchFound)
+                                    {
+                                        SearchByCustNo(matchedCustNo, true);
+                                        textBox9.Text = matchedCustNo;
                                     }
                                 }
                                 catch(Exception ex)
