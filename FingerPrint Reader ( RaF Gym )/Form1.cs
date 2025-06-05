@@ -47,6 +47,8 @@ namespace FingerPrint_Reader___RaF_Gym__
 
         string CustomerNo, PhoneNumber;
 
+        private List<(string CustNo, byte[] Template)> fingerprintCache;
+
         IntPtr mDevHandle = IntPtr.Zero;
         IntPtr mDBHandle = IntPtr.Zero;
         IntPtr FormHandle = IntPtr.Zero;
@@ -95,7 +97,31 @@ namespace FingerPrint_Reader___RaF_Gym__
             searchByCustomerNumber = true;
             searchByPhone = false;
             checkBox1.Checked = true;
+            LoadFingerprintCache();
         }
+
+        private void LoadFingerprintCache()
+        {
+            fingerprintCache = new List<(string CustNo, byte[] Template)>();
+
+            string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
+            string query = "SELECT Cust_No, Fingerprint FROM Customers WHERE Fingerprint IS NOT NULL";
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            {
+                connection.Open();
+                OleDbCommand command = new OleDbCommand(query, connection);
+                OleDbDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string custNo = reader["Cust_No"].ToString();
+                    string base64 = reader["Fingerprint"].ToString();
+                    byte[] template = zkfp.Base64String2Blob(base64);
+                    fingerprintCache.Add((custNo, template));
+                }
+            }
+        }
+
 
         private void bnInit_Click(object sender, EventArgs e)
         {
@@ -191,205 +217,19 @@ namespace FingerPrint_Reader___RaF_Gym__
             label13.Text = "تم فتح جهاز البصمة.";
         }
 
-        //private void DoCapture()
-        //{
-        //    while (!bIsTimeToDie)
-        //    {
-        //        cbCapTmp = 2048;
-        //        int ret = zkfp2.AcquireFingerprint(mDevHandle, FPBuffer, CapTmp, ref cbCapTmp);
-        //        if (ret == zkfp.ZKFP_ERR_OK)
-        //        {
-        //            SendMessage(FormHandle, MESSAGE_CAPTURED_OK, IntPtr.Zero, IntPtr.Zero);
-        //        }
-        //        Thread.Sleep(200);
-        //    }
-        //}
-
-        private byte[] GetFingerprintTemplateFromDB(int customerId)
+        private void DoCapture()
         {
-            string mdbFilePath = @"D:\playground\Testdb.mdb";
-            string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
-
-            string query = "SELECT Fingerprint FROM Customers WHERE Cust_No = ?";
-
-            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            while (!bIsTimeToDie)
             {
-                connection.Open();
-                using (OleDbCommand command = new OleDbCommand(query, connection))
+                cbCapTmp = 2048;
+                int ret = zkfp2.AcquireFingerprint(mDevHandle, FPBuffer, CapTmp, ref cbCapTmp);
+                if (ret == zkfp.ZKFP_ERR_OK)
                 {
-                    command.Parameters.AddWithValue("?", customerId);
-                    string base64Template = (string)command.ExecuteScalar();
-
-                    if (!string.IsNullOrEmpty(base64Template))
-                    {
-                        return Convert.FromBase64String(base64Template);
-                    }
+                    SendMessage(FormHandle, MESSAGE_CAPTURED_OK, IntPtr.Zero, IntPtr.Zero);
                 }
+                Thread.Sleep(200);
             }
-            return null;
-        }
-        private void PopulateSubscriptions()
-        {
-            string mdbFilePath = @"D:\playground\Testdb.mdb";
-            string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
-
-            string query = @"
-        INSERT INTO Subscribe (Cust_No, Start_Date, End_Date, Pay_Date, Total_Amount, 
-                              Payed, NotPayed, Last_PayDate, Pay_Method, SubPeriod) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-            using (OleDbConnection connection = new OleDbConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    OleDbTransaction transaction = connection.BeginTransaction();
-
-                    using (OleDbCommand command = new OleDbCommand(query, connection, transaction))
-                    {
-                        // Add parameters...
-
-                        Random random = new Random();
-                        string[] paymentMethods = { "Cash", "Credit Card", "Bank Transfer", "PayPal" };
-                        string[] periods = { "Monthly", "Quarterly", "Annual" };
-
-                        for (int custId = 1; custId <= 4000; custId++)
-                        {
-                            DateTime startDate = DateTime.Today.AddDays(-random.Next(365));
-                            DateTime endDate = startDate.AddDays(30 * random.Next(1, 13)); // 1-12 months
-
-                            command.Parameters.Clear();
-                            command.Parameters.AddWithValue("?", custId);
-                            command.Parameters.AddWithValue("?", startDate);
-                            command.Parameters.AddWithValue("?", endDate);
-                            command.Parameters.AddWithValue("?", startDate.AddDays(random.Next(5)));
-                            command.Parameters.AddWithValue("?", 50 + random.Next(200));
-                            command.Parameters.AddWithValue("?", 50 + random.Next(200));
-                            command.Parameters.AddWithValue("?", 0); // NotPayed
-                            command.Parameters.AddWithValue("?", startDate.AddDays(random.Next(5)));
-                            command.Parameters.AddWithValue("?", paymentMethods[random.Next(paymentMethods.Length)]);
-                            command.Parameters.AddWithValue("?", periods[random.Next(periods.Length)]);
-
-                            command.ExecuteNonQuery();
-                        }
-                    }
-
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    // Error handling
-                }
-            }
-        }
-        private void PopulateDatabase()
-        {
-            string mdbFilePath = @"D:\playground\Testdb.mdb";
-            string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
-
-            // Clear existing data first
-            string clearQuery = "DELETE FROM Customers";
-
-            // Insert query with all required fields
-            string insertQuery = @"
-        INSERT INTO Customers (Cust_No, Cust_Name, SubType, Fingerprint, Cust_Photo) 
-        VALUES (?, ?, ?, ?, ?)";
-
-            using (OleDbConnection connection = new OleDbConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-
-                    // Clear existing data
-                    using (OleDbCommand clearCommand = new OleDbCommand(clearQuery, connection))
-                    {
-                        clearCommand.ExecuteNonQuery();
-                    }
-
-                    // Begin transaction for bulk insert
-                    OleDbTransaction transaction = connection.BeginTransaction();
-
-                    using (OleDbCommand insertCommand = new OleDbCommand(insertQuery, connection, transaction))
-                    {
-                        // Add parameters in the correct order
-                        insertCommand.Parameters.Add("Cust_No", OleDbType.Integer);
-                        insertCommand.Parameters.Add("Cust_Name", OleDbType.VarWChar);
-                        insertCommand.Parameters.Add("SubType", OleDbType.VarWChar);
-                        insertCommand.Parameters.Add("Fingerprint", OleDbType.LongVarWChar); // For Base64
-                        insertCommand.Parameters.Add("Cust_Photo", OleDbType.VarWChar);
-
-                        Random random = new Random();
-                        string[] customerTypes = { "Standard", "Premium", "VIP", "Corporate" };
-
-                        for (int i = 1; i <= 4000; i++)
-                        {
-                            // Generate realistic fingerprint template
-                            byte[] fingerprintBytes = GenerateRealisticFingerprintTemplate(400); // 400 bytes is realistic
-                            string base64Fingerprint = Convert.ToBase64String(fingerprintBytes);
-
-                            // Set parameter values
-                            insertCommand.Parameters["Cust_No"].Value = i;
-                            insertCommand.Parameters["Cust_Name"].Value = $"Customer_{i}";
-                            insertCommand.Parameters["SubType"].Value = customerTypes[random.Next(customerTypes.Length)];
-                            insertCommand.Parameters["Fingerprint"].Value = base64Fingerprint;
-                            insertCommand.Parameters["Cust_Photo"].Value = $"/photos/customer_{i}.jpg";
-
-                            insertCommand.ExecuteNonQuery();
-
-                            // Progress reporting
-                            if (i % 100 == 0)
-                            {
-                                Console.WriteLine($"Inserted {i} records...");
-                                Debug.WriteLine($"Sample Fingerprint: {base64Fingerprint.Substring(0, 20)}...");
-                            }
-                        }
-                    }
-
-                    transaction.Commit();
-                    MessageBox.Show("Database populated successfully with valid Base64 fingerprints");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error: {ex.Message}\n\n{ex.StackTrace}");
-                    Debug.WriteLine($"Full error: {ex.ToString()}");
-                }
-            }
-        }
-
-        private byte[] GenerateRealisticFingerprintTemplate(int size)
-        {
-            byte[] template = new byte[size];
-            new Random().NextBytes(template);
-
-            // Add realistic fingerprint template headers
-            if (size > 10)
-            {
-                // Common fingerprint template header bytes
-                template[0] = 0x46; // 'F'
-                template[1] = 0x50; // 'P'
-                template[2] = 0x54; // 'T'
-                template[3] = 0x01; // Version
-            }
-
-            return template;
-        }
-
-        //TestCapture
-        private void DoTestCapture()
-        {
-            cbCapTmp = 2048;
-
-            CapTmp = GetFingerprintTemplateFromDB(3777);
-            // MOCK: Simulate successful acquisition
-            int ret = zkfp.ZKFP_ERR_OK;          
-
-            if (ret == zkfp.ZKFP_ERR_OK)
-            {
-                SendMessage(FormHandle, MESSAGE_CAPTURED_OK, IntPtr.Zero, IntPtr.Zero);
-            }
-            Thread.Sleep(200); 
-        }
+        }        
 
         protected override void DefWndProc(ref Message m)
         {
@@ -397,10 +237,10 @@ namespace FingerPrint_Reader___RaF_Gym__
             {
                 case MESSAGE_CAPTURED_OK:
                     {
-                        //MemoryStream ms = new MemoryStream();
-                        //BitmapFormat.GetBitmap(FPBuffer, mfpWidth, mfpHeight, ref ms);
-                        //Bitmap bmp = new Bitmap(ms);
-                        //this.picFPImg.Image = bmp;
+                        MemoryStream ms = new MemoryStream();
+                        BitmapFormat.GetBitmap(FPBuffer, mfpWidth, mfpHeight, ref ms);
+                        Bitmap bmp = new Bitmap(ms);
+                        this.picFPImg.Image = bmp;
                         if (IsRegister)
                         {
                             int ret = zkfp.ZKFP_ERR_OK;
@@ -459,43 +299,29 @@ namespace FingerPrint_Reader___RaF_Gym__
                             {
                                 try
                                 {
-                                    string mdbFilePath = @"D:\playground\Testdb.mdb";
+                                    var matchFound = false;
+                                    string matchedCustNo = null;
+                                    object lockObj = new object();
 
-                                    string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
-                                    string query = "SELECT * FROM Customers";
-
-                                    using (OleDbConnection connection = new OleDbConnection(connectionString))
+                                    Parallel.ForEach(fingerprintCache, (record, state) =>
                                     {
-                                        try
+                                        if (CapTmp.SequenceEqual(record.Template))
                                         {
-                                            int x = 0;
-                                            connection.Open();
-                                            OleDbCommand command = new OleDbCommand(query, connection);
-                                            OleDbDataReader reader = command.ExecuteReader();
-                                            while (reader.Read())
+                                            lock (lockObj)
                                             {
-                                                if (!reader.IsDBNull(reader.GetOrdinal("Fingerprint")))
-                                                {
-                                                    string stringTemplate = reader.GetString(reader.GetOrdinal("Fingerprint"));
-                                                    byte[] templateFromDbZk4500 = zkfp.Base64String2Blob(stringTemplate);
-
-                                                    
-                                                    if (CapTmp.SequenceEqual(templateFromDbZk4500)) // crude match
-                                                    {
-                                                        // Found a match
-                                                        Console.WriteLine("FOUND A MATCH!!!");
-                                                        SearchByCustNo(reader["Cust_No"].ToString(), true);
-                                                        textBox9.Text = reader["Cust_No"].ToString();
-                                                        break;
-                                                    }
-                                                }
+                                                matchFound = true;
+                                                matchedCustNo = record.CustNo;
                                             }
+
+                                            // Stop the parallel loop
+                                            state.Stop();
                                         }
-                                        catch (Exception ex)
-                                        {
-                                            MessageBox.Show("Error during matching : " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                            File.AppendAllText("Reference\\Logs.txt", $"\r\nError DefWndProc Exception 2 : {ex.Message}");
-                                        }
+                                    });
+
+                                    if (matchFound)
+                                    {
+                                        SearchByCustNo(matchedCustNo, true);
+                                        textBox9.Text = matchedCustNo;
                                     }
                                 }
                                 catch(Exception ex)
@@ -1314,11 +1140,6 @@ ORDER BY Subscribe.End_Date DESC";
                searchByPhone = false;
                searchByCustomerNumber = true;
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            DoTestCapture();
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
