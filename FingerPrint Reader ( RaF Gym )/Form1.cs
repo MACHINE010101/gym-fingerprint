@@ -305,7 +305,9 @@ namespace FingerPrint_Reader___RaF_Gym__
 
                                     Parallel.ForEach(fingerprintCache, (record, state) =>
                                     {
-                                        if (CapTmp.SequenceEqual(record.Template))
+                                        int score = zkfp2.DBMatch(mDBHandle, record.Template, CapTmp);
+
+                                        if (score > 0)
                                         {
                                             lock (lockObj)
                                             {
