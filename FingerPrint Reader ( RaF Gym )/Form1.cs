@@ -484,19 +484,10 @@ namespace FingerPrint_Reader___RaF_Gym__
                                                     {
                                                         // Found a match
                                                         Console.WriteLine("FOUND A MATCH!!!");
-                                                        //SearchByCustNo(reader["Cust_No"].ToString(), true);
+                                                        SearchByCustNo(reader["Cust_No"].ToString(), true);
                                                         textBox9.Text = reader["Cust_No"].ToString();
                                                         break;
                                                     }
-
-                                                    //int score = zkfp2.DBMatch(mDBHandle, templateFromDbZk4500, CapTmp);
-
-                                                    //if (score > 0)
-                                                    //{
-                                                    //    SearchByCustNo(reader["Cust_No"].ToString(), true);
-                                                    //    textBox9.Text = reader["Cust_No"].ToString();
-                                                    //    break;
-                                                    //}
                                                 }
                                             }
                                         }
@@ -656,6 +647,8 @@ namespace FingerPrint_Reader___RaF_Gym__
         }
         private void SearchByCustNo(string CustNo, bool enter)
         {
+            string mdbFilePath = @"D:\playground\Testdb.mdb";
+
             DateTime dateTimeNow = DateTime.Now.Date;
             string connectionString = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
             string query = @"
@@ -723,7 +716,7 @@ ORDER BY Subscribe.End_Date DESC";
 
                                     if (enter == true) 
                                     {
-                                        INSERTLOGS(CustNo, reader["Cust_Name"]?.ToString());
+                                        //INSERTLOGS(CustNo, reader["Cust_Name"]?.ToString());
                                     }
 
                                     DateTime? stopTo = null;

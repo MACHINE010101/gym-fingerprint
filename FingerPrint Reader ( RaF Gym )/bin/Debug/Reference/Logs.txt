@@ -45,3 +45,4 @@ Error SearchByCustNo : String was not recognized as a valid DateTime.
 Error SearchByCustNo : المسار '\\server\C\projects\RafW\Maindb.mdb' غير صالح. تأكد من أن تهجئة اسم المسار صحيحة ومن أن الاتصال يتم مع الملقم الذي يكمن فيه الملف.
 Error SearchByCustNo : محاولة غير صالحة لاستدعاء Read في الوقت الذي يكون القارئ فيه مغلقًا.
 Error SearchByCustNo : '\\server\C\projects\Raf\Maindb.mdb' is not a valid path.  Make sure that the path name is spelled correctly and that you are connected to the server on which the file resides.
+Error Insert Logs Function : '\\server\C\projects\Raf\Maindb.mdb' is not a valid path.  Make sure that the path name is spelled correctly and that you are connected to the server on which the file resides.
