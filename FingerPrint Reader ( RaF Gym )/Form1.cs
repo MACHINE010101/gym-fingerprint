@@ -38,7 +38,7 @@ namespace FingerPrint_Reader___RaF_Gym__
         //PATH FOR WOMENS = \\server\C\projects\RafW\Maindb.mdb
         //PATH FOR MENS = \\server\C\projects\RafW\Maindb.mdb
 
-        string mdbFilePath = @"\\server\C\projects\Raf\Maindb.mdb";
+        string mdbFilePath = @"D:\playground\TestDB.mdb";
 
 
         bool fingerIsRegistered = false;
@@ -47,7 +47,7 @@ namespace FingerPrint_Reader___RaF_Gym__
 
         string CustomerNo, PhoneNumber;
 
-        private List<(string CustNo, byte[] Template)> fingerprintCache;
+        private List<(string CustNo, string Base64Template)> fingerprintCache;
 
         IntPtr mDevHandle = IntPtr.Zero;
         IntPtr mDBHandle = IntPtr.Zero;
@@ -87,7 +87,6 @@ namespace FingerPrint_Reader___RaF_Gym__
             dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Arial", 11, FontStyle.Bold);
 
             Task.Run(() => CheckForUpdateAsync(pastebinUrl));
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -102,7 +101,7 @@ namespace FingerPrint_Reader___RaF_Gym__
 
         private void LoadFingerprintCache()
         {
-            fingerprintCache = new List<(string CustNo, byte[] Template)>();
+            fingerprintCache = new List<(string CustNo, string Base64Template)>();
 
             string connectionString = $@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={mdbFilePath};";
             string query = "SELECT Cust_No, Fingerprint FROM Customers WHERE Fingerprint IS NOT NULL";
@@ -116,8 +115,7 @@ namespace FingerPrint_Reader___RaF_Gym__
                 {
                     string custNo = reader["Cust_No"].ToString();
                     string base64 = reader["Fingerprint"].ToString();
-                    byte[] template = zkfp.Base64String2Blob(base64);
-                    fingerprintCache.Add((custNo, template));
+                    fingerprintCache.Add((custNo, base64));
                 }
             }
         }
@@ -299,34 +297,20 @@ namespace FingerPrint_Reader___RaF_Gym__
                             {
                                 try
                                 {
-                                    var matchFound = false;
-                                    string matchedCustNo = null;
-                                    object lockObj = new object();
-
-                                    Parallel.ForEach(fingerprintCache, (record, state) =>
+                                    foreach (var record in fingerprintCache)
                                     {
-                                        int score = zkfp2.DBMatch(mDBHandle, record.Template, CapTmp);
-
+                                        byte[] template = zkfp.Base64String2Blob(record.Base64Template);
+                                        int score = zkfp2.DBMatch(mDBHandle, template, CapTmp);
                                         if (score > 0)
                                         {
-                                            lock (lockObj)
-                                            {
-                                                matchFound = true;
-                                                matchedCustNo = record.CustNo;
-                                            }
-
-                                            // Stop the parallel loop
-                                            state.Stop();
+                                            // Match found
+                                            SearchByCustNo(record.CustNo, true);
+                                            textBox9.Text = record.CustNo;
+                                            break;
                                         }
-                                    });
-
-                                    if (matchFound)
-                                    {
-                                        SearchByCustNo(matchedCustNo, true);
-                                        textBox9.Text = matchedCustNo;
                                     }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     MessageBox.Show("Error : " + ex.Message,"RaF Gym",MessageBoxButtons.OK,MessageBoxIcon.Error);
                                 }

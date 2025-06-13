@@ -48,7 +48,6 @@ E:\My SRCs\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Deb
 D:\My SRCs\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Debug\Newtonsoft.Json.dll
 D:\My SRCs\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Debug\Newtonsoft.Json.xml
 D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Debug\FingerPrint Reader ( RaF Gym ).csproj.AssemblyReference.cache
-D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Debug\FingerPrint Reader ( RaF Gym ).exe.config
 D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Debug\FingerPrint_Reader___RaF_Gym__.Form1.resources
 D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Debug\FingerPrint_Reader___RaF_Gym__.Properties.Resources.resources
 D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Debug\FingerPrint Reader ( RaF Gym ).csproj.GenerateResource.cache

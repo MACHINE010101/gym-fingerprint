@@ -1,0 +1,13 @@
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Release\FingerPrint Reader ( RaF Gym ).exe.config
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Release\FingerPrint Reader ( RaF Gym ).exe
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Release\FingerPrint Reader ( RaF Gym ).pdb
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Release\Newtonsoft.Json.dll
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\bin\Release\Newtonsoft.Json.xml
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPrint Reader ( RaF Gym ).csproj.AssemblyReference.cache
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPrint_Reader___RaF_Gym__.Form1.resources
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPrint_Reader___RaF_Gym__.Properties.Resources.resources
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPrint Reader ( RaF Gym ).csproj.GenerateResource.cache
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPrint Reader ( RaF Gym ).csproj.CoreCompileInputs.cache
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPr.93EB76EB.Up2Date
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPrint Reader ( RaF Gym ).exe
+D:\playground\FingerPrint Reader ( RaF Gym )\FingerPrint Reader ( RaF Gym )\obj\Release\FingerPrint Reader ( RaF Gym ).pdb
